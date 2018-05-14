@@ -1,6 +1,6 @@
 #' A complete table for univariable survival analysis
 #'
-#'JS.uni output the table with general survival analysis result with Number of total patients,
+#'surv_multiuni output the table with general survival analysis result with Number of total patients,
 #'Number of Events, Estimated Median, 1,2,5 year rate, HR (95\% Confidence Interval),P value This function only change the format of the output table.
 #'@param Data A data.frame in which to interpret the variables
 #'@param Event The status indicator, normally 0=alive, 1=dead

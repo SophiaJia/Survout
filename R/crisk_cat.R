@@ -37,9 +37,10 @@ crisk_cat <- function(csurv, cevent, cvars, gnames, month = 0, y1 = T, y2 = T, y
   cvars <- factor(cvars)
   var.matrix <- model.matrix(~cvars)[,-1]
 
-
+  nlevel <- table(cvars) %>% names %>% length
   # n and event
   result <- tibble(
+    `Variable` =  c(gnames,rep("", nlevel - 1)),
     `Varaible Levels` = table(cvars) %>% names,
     `N` = table(cvars),
     `Number of event` = table(cvars, cevent)[,2],
@@ -120,6 +121,8 @@ crisk_cat <- function(csurv, cevent, cvars, gnames, month = 0, y1 = T, y2 = T, y
 
   return(result)
 }
+
+
 
 
 

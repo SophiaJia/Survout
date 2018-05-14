@@ -28,9 +28,11 @@ crisk_ord <- function (csurv, cevent, cvars, gnames, month = 0, y1 = T, y2 = T, 
   fit = cmprsk::crr(csurv, cevent, cvars)
   fit2 <- cmprsk::cuminc(csurv, cevent, cvars)
 
+  nlevel <- levels(cvars) %>% length
 
   # n and event
   result <- tibble(
+    `Variable` =  c(gnames,rep("", nlevel - 1)),
     `Varaible Levels` = levels(cvars),
     `N` = table(cvars),
     `Number of event` = table(cvars, cevent)[,2],

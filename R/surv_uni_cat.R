@@ -16,110 +16,76 @@
 #'@export
 #'@name surv_uni_cat
 #'
-crisk_cat <- function(csurv, cevent, cvars, gnames, month = 0, y1 = T, y2 = T, y5 = T){
+surv_uni_cat <- function(Data, Stime, Event, Svar, month = 0, y1 = T, y2 = T, y5 = T){
+  ## univariable analysis for one factor variable.
+  ## input : Data, Survival time, Event, Testing variable, AsFactor or not, Month of survival rate, and Rho (type of logtest)
+  ## output: N, N.event, median survival , 1-year rate(95%CI), 2-year rate(95%CI), 5-year rate(95%CI), other rate, HR(95%CI), P, AIC, and C index
+  ## require library: survival , tidyverse
+  ## can it comes with a plot in this function?
 
-  # exclude missing for making model.matrix
-  datmp <- cbind(cvars, csurv, cevent)
+  D <- Data %>% select(Stime = Stime, Event = Event, Svar = Svar)
+  # D <- na.omit(D)
 
-  if(sum(is.na(cvars)) > 0 ){
-    var_missing <- which(is.na(cvars))
-    datmp <- datmp[-var_missing,]
-  }
+  # default log-rank test
+  fit0 <- survdiff(Surv(Stime, Event) ~ Svar, data = D)
+  fit1 <- coxph(Surv(Stime, Event) ~ as.factor(Svar), data = D)
+  fit2 <- survfit(Surv(Stime, Event) ~ Svar, data = D, conf.type="log-log")
 
-  # exclude the level of variable which has no risk event
-  del_factor  <- names(datmp[,1] %>% table)[which(table(datmp[,1], datmp[,3])[,2] <1)]
-  del_factor2 <- names(datmp[,1] %>% table)[table(datmp[,1]) < 10]
-  datmp <-datmp[!((datmp[,1] %in% del_factor)&(datmp[,1] %in% del_factor2)),]
+  # N and event N
+  result = tibble(
+    `Variable` = c(Svar, rep(" ", length(fit0$n)-1)),
+    `Variable Level` =  D$Svar %>% table() %>% names(),
+    N = fit0$n,
+    `No.Event` = fit0$obs)
 
-  cvars  <- datmp[,1]
-  csurv  <- as.numeric(datmp[,2])
-  cevent <- datmp[,3]
-  cvars <- factor(cvars)
-  var.matrix <- model.matrix(~cvars)[,-1]
+  ## median survival
+  result %<>% mutate(`Estimated Median (month)` = summary(fit2 )$table[,c('median')] %>% format(.,digits = 3))
 
-
-  # n and event
-  result <- tibble(
-    `Varaible Levels` = table(cvars) %>% names,
-    `N` = table(cvars),
-    `Number of event` = table(cvars, cevent)[,2],
-    `Number of competing event` = table(cvars, cevent)[,3]
-  )
-
-
-
-  # build model
-  fit = cmprsk::crr(csurv, cevent, var.matrix)
-  fit2 <- cmprsk::cuminc(csurv, cevent, var.matrix)
-
-  ## time range (the min follow up time of these levels)
-  tmp.df <- cbind(csurv, cvars) %>% as.tibble()
-  complete_df <- tmp.df[complete.cases(tmp.df),]
-  complete_df %>% group_by(cvars) %>% summarise(Value = max(csurv,na.rm = TRUE)) -> .tmp
+  ##time range
+  D %>% group_by(Svar) %>% summarise(Value = max(Stime,na.rm = TRUE)) -> .tmp
   time_min = .tmp$Value %>% min()
 
-  #incident rate:
-  n <- result %>% nrow()
+  ## survival rate
 
   if(time_min > 11.999999 & y1 == T){
-    cc <- cmprsk::timepoints(fit2, times = 12)
-    est <- cc$est[1:n] %>% round(2)
-    car <- cc$var[1:n] %>% round(2)
-
-    result <- result %>%
-      mutate(`1-year rate` = paste(est * 100, "%", "\u00B1",car * 100, "%") %>% t %>% t )
+    result %<>% mutate(`1-year rate` = paste(J.digit(summary(fit2, time = 12)$surv * 100 , 0), '%(' ,
+                                             J.digit(summary(fit2, time = 12)$lower * 100, 0), '%, ',
+                                             J.digit(summary(fit2, time = 12)$upper * 100, 0),  '%)'))
   }
-
-
   if(time_min > 23.999999 & y2 == T){
-    cc <- cmprsk::timepoints(fit2, times = 24)
-    est <- cc$est[1:n] %>% round(2)
-    car <- cc$var[1:n] %>% round(2)
-
-    result <- result %>%
-      mutate(`2-year rate` = paste(est * 100, "%", "\u00B1",car * 100, "%") %>% t %>% t )
+    result %<>% mutate(`2-year rate` =  paste(J.digit(summary(fit2, time = 24)$surv * 100 , 0), '%(' ,
+                                              J.digit(summary(fit2, time = 24)$lower * 100, 0), '%, ',
+                                              J.digit(summary(fit2, time = 24)$upper * 100, 0),  '%)'))
   }
-
   if(time_min > 59.999999 & y5 == T){
-    cc <- cmprsk::timepoints(fit2, times = 60)
-    est <- cc$est[1:n] %>% round(2)
-    car <- cc$var[1:n] %>% round(2)
-
-    result <- result %>%
-      mutate(`5-year rate` = paste(est * 100, "%", "\u00B1",car * 100, "%") %>% t %>% t )
+    result %<>% mutate(`5-year rate` = paste(J.digit(summary(fit2, time = 60)$surv * 100 , 0), '%(' ,
+                                             J.digit(summary(fit2, time = 60)$lower * 100, 0), '%, ',
+                                             J.digit(summary(fit2, time = 60)$upper * 100, 0),  '%)'))
   }
-
   if(month !=0){
     if(month > time_min){
       warning("The month your choose is beyond the time range, choose a smaller one")
     }
     else{
-      cc <- cmprsk::timepoints(fit2, times = month)
-      est <- cc$est[1:n] %>% round(2)
-      car <- cc$var[1:n] %>% round(2)
+      result %<>% mutate(`N-year rate` = paste(J.digit(summary(fit2, time = month)$surv * 100 , 0), '%(' ,
+                                               J.digit(summary(fit2, time = month)$lower * 100, 0), '%, ',
+                                               J.digit(summary(fit2, time = month)$upper * 100, 0),  '%)'))
 
-      result <- result %>%
-        mutate(`N-year rate` = paste(est * 100, "%", "\u00B1",car * 100, "%") %>% t %>% t )
+    }
+  }
 
-    }}
-
-
-  blackrow = rep("")
   ##HR (95\% Confidence Interval)
-  S <- summary(fit)
-  HR <- J.digit(S$coef[, c(2)], 2)
-  LCL <- J.digit(S$conf.int[, c(3)], 2)
-  UCL <- J.digit(S$conf.int[, c(4)], 2)
-  HR95CI <- paste(HR, "(", LCL, ",", UCL, ")")
-  result <-
-    result %>%
-    mutate(`HR (95% CI)` = c(blackrow,HR95CI)) %>%
-    mutate(`P` = c(blackrow, JS.p(S$coef[, c(5)])))
+  result %<>%
+    mutate(`HR (95%CI)` = c( "Ref",paste(J.digit(summary(fit1)$conf.int[, 1], 2), '(' ,
+                                         J.digit(summary(fit1)$conf.int[, 3], 2), ',' ,
+                                         J.digit(summary(fit1)$conf.int[, 4], 2), ')' ))) %>%
+    mutate(`P` = c( "", summary(fit1)$coefficients[,5] %>% JS.p))
 
-  ## AIC, Cindex, (D index maybe)
+  ## AIC , C index (D index maybe)
+  blackrow = rep("",nrow(result)-1)
+  result %<>%
+    mutate(`C Index` =  c(J.digit(summary(fit1)$concordance[1],2),blackrow)) %>%
+    mutate(`AIC` = c(J.digit(AIC(fit1),2),blackrow))
 
   return(result)
 }
-
-
-
