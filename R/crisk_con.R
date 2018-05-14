@@ -23,7 +23,7 @@ crisk_con <- function (csurv, cevent, cvars, gnames){
   HR95CI <- paste(HR,'(',LCL,',',UCL,')')
   p   <- JS.p(S$coef[,c(5)])
   out <- cbind(HR95CI, p)
-  rownames(out) <- gnames
+  #rownames(out) <- gnames
   colnames(out) <- c('Hazard Ratio (95% CI)', 'P')
   return(out)
 }

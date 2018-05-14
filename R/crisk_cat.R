@@ -18,14 +18,25 @@
 
 crisk_cat <- function(csurv, cevent, cvars, gnames, month = 0, y1 = T, y2 = T, y5 = T){
 
-  var_missing <- which(is.na(cvars))
-  cvars  <- cvars[-var_missing]
-  csurv  <- csurv[-var_missing]
-  cevent <- cevent[-var_missing]
+  # exclude missing for making model.matrix
+  datmp <- cbind(cvars, csurv, cevent)
+
+  if(sum(is.na(cvars)) > 0 ){
+    var_missing <- which(is.na(cvars))
+    datmp <- datmp[-var_missing,]
+  }
+
+  # exclude the level of variable which has no risk event
+  del_factor  <- names(datmp[,1] %>% table)[which(table(datmp[,1], datmp[,3])[,2] <1)]
+  del_factor2 <- names(datmp[,1] %>% table)[table(datmp[,1]) < 10]
+  datmp <-datmp[!((datmp[,1] %in% del_factor)&(datmp[,1] %in% del_factor2)),]
+
+  cvars  <- datmp[,1]
+  csurv  <- as.numeric(datmp[,2])
+  cevent <- datmp[,3]
+  cvars <- factor(cvars)
   var.matrix <- model.matrix(~cvars)[,-1]
 
-  fit = cmprsk::crr(csurv, cevent, var.matrix)
-  fit2 <- cmprsk::cuminc(csurv, cevent, var.matrix)
 
   # n and event
   result <- tibble(
@@ -35,6 +46,12 @@ crisk_cat <- function(csurv, cevent, cvars, gnames, month = 0, y1 = T, y2 = T, y
     `Number of competing event` = table(cvars, cevent)[,3]
   )
 
+
+
+  # build model
+  fit = cmprsk::crr(csurv, cevent, var.matrix)
+  fit2 <- cmprsk::cuminc(csurv, cevent, var.matrix)
+
   ## time range (the min follow up time of these levels)
   tmp.df <- cbind(csurv, cvars) %>% as.tibble()
   complete_df <- tmp.df[complete.cases(tmp.df),]
@@ -42,11 +59,12 @@ crisk_cat <- function(csurv, cevent, cvars, gnames, month = 0, y1 = T, y2 = T, y
   time_min = .tmp$Value %>% min()
 
   #incident rate:
+  n <- result %>% nrow()
 
   if(time_min > 11.999999 & y1 == T){
     cc <- cmprsk::timepoints(fit2, times = 12)
-    est <- cc$est[1:4] %>% round(2)
-    car <- cc$var[1:4] %>% round(2)
+    est <- cc$est[1:n] %>% round(2)
+    car <- cc$var[1:n] %>% round(2)
 
     result <- result %>%
       mutate(`1-year rate` = paste(est * 100, "%", "\u00B1",car * 100, "%") %>% t %>% t )
@@ -55,8 +73,8 @@ crisk_cat <- function(csurv, cevent, cvars, gnames, month = 0, y1 = T, y2 = T, y
 
   if(time_min > 23.999999 & y2 == T){
     cc <- cmprsk::timepoints(fit2, times = 24)
-    est <- cc$est[1:4] %>% round(2)
-    car <- cc$var[1:4] %>% round(2)
+    est <- cc$est[1:n] %>% round(2)
+    car <- cc$var[1:n] %>% round(2)
 
     result <- result %>%
       mutate(`2-year rate` = paste(est * 100, "%", "\u00B1",car * 100, "%") %>% t %>% t )
@@ -64,8 +82,8 @@ crisk_cat <- function(csurv, cevent, cvars, gnames, month = 0, y1 = T, y2 = T, y
 
   if(time_min > 59.999999 & y5 == T){
     cc <- cmprsk::timepoints(fit2, times = 60)
-    est <- cc$est[1:4] %>% round(2)
-    car <- cc$var[1:4] %>% round(2)
+    est <- cc$est[1:n] %>% round(2)
+    car <- cc$var[1:n] %>% round(2)
 
     result <- result %>%
       mutate(`5-year rate` = paste(est * 100, "%", "\u00B1",car * 100, "%") %>% t %>% t )
@@ -77,8 +95,8 @@ crisk_cat <- function(csurv, cevent, cvars, gnames, month = 0, y1 = T, y2 = T, y
     }
     else{
       cc <- cmprsk::timepoints(fit2, times = month)
-      est <- cc$est[1:4] %>% round(2)
-      car <- cc$var[1:4] %>% round(2)
+      est <- cc$est[1:n] %>% round(2)
+      car <- cc$var[1:n] %>% round(2)
 
       result <- result %>%
         mutate(`N-year rate` = paste(est * 100, "%", "\u00B1",car * 100, "%") %>% t %>% t )
@@ -102,5 +120,7 @@ crisk_cat <- function(csurv, cevent, cvars, gnames, month = 0, y1 = T, y2 = T, y
 
   return(result)
 }
+
+
 
 

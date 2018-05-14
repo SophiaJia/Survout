@@ -16,6 +16,7 @@
 #'@name crisk_ord
 #'
 
+
 crisk_ord <- function (csurv, cevent, cvars, gnames, month = 0, y1 = T, y2 = T, y5 = T ){
 
   # This function takes the ordinal variable as input.
@@ -44,10 +45,13 @@ crisk_ord <- function (csurv, cevent, cvars, gnames, month = 0, y1 = T, y2 = T, 
 
 
   #incident rate:
+
+  n <- result %>% nrow()
+
   if(time_min > 11.999999 & y1 == T){
     cc <- cmprsk::timepoints(fit2, times = 12)
-    est <- cc$est[1:4] %>% round(2)
-    car <- cc$var[1:4] %>% round(2)
+    est <- cc$est[1:n] %>% round(2)
+    car <- cc$var[1:n] %>% round(2)
 
     result <- result %>%
       mutate(`1-year rate` = paste(est * 100, "%", "\u00B1",car * 100, "%") %>% t %>% t )
@@ -56,8 +60,8 @@ crisk_ord <- function (csurv, cevent, cvars, gnames, month = 0, y1 = T, y2 = T, 
 
   if(time_min > 23.999999 & y2 == T){
     cc <- cmprsk::timepoints(fit2, times = 24)
-    est <- cc$est[1:4] %>% round(2)
-    car <- cc$var[1:4] %>% round(2)
+    est <- cc$est[1:n] %>% round(2)
+    car <- cc$var[1:n] %>% round(2)
 
     result <- result %>%
       mutate(`2-year rate` = paste(est * 100, "%", "\u00B1",car * 100, "%") %>% t %>% t )
@@ -65,8 +69,8 @@ crisk_ord <- function (csurv, cevent, cvars, gnames, month = 0, y1 = T, y2 = T, 
 
   if(time_min > 59.999999 & y5 == T){
     cc <- cmprsk::timepoints(fit2, times = 60)
-    est <- cc$est[1:4] %>% round(2)
-    car <- cc$var[1:4] %>% round(2)
+    est <- cc$est[1:n] %>% round(2)
+    car <- cc$var[1:n] %>% round(2)
 
     result <- result %>%
       mutate(`5-year rate` = paste(est * 100, "%", "\u00B1",car * 100, "%") %>% t %>% t )
@@ -78,8 +82,8 @@ crisk_ord <- function (csurv, cevent, cvars, gnames, month = 0, y1 = T, y2 = T, 
     }
     else{
       cc <- cmprsk::timepoints(fit2, times = month)
-      est <- cc$est[1:4] %>% round(2)
-      car <- cc$var[1:4] %>% round(2)
+      est <- cc$est[1:n] %>% round(2)
+      car <- cc$var[1:n] %>% round(2)
 
       result <- result %>%
         mutate(`N-year rate` = paste(est * 100, "%", "\u00B1",car * 100, "%") %>% t %>% t )
@@ -102,4 +106,3 @@ crisk_ord <- function (csurv, cevent, cvars, gnames, month = 0, y1 = T, y2 = T, 
 
   return(result)
 }
-
