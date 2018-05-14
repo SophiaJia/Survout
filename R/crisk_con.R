@@ -22,8 +22,12 @@ crisk_con <- function (csurv, cevent, cvars, gnames){
   UCL <- J.digit(S$conf.int[,c(4)], 2)
   HR95CI <- paste(HR,'(',LCL,',',UCL,')')
   p   <- JS.p(S$coef[,c(5)])
-  out <- cbind(HR95CI, p)
-  #rownames(out) <- gnames
-  colnames(out) <- c('Hazard Ratio (95% CI)', 'P')
-  return(out)
+
+  result <- tibble(
+    `Variable` = gnames,
+    `HR (95% CI)` = HR95CI,
+    `P` = p
+  )
+  return(result)
 }
+
