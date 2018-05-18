@@ -28,7 +28,7 @@ surv_multiuni(Data, Stime, Event, catSvars = NULL, conSvars = NULL,
 A tibble of survival output
 }
 \description{
-JS.uni output the table with general survival analysis result with Number of total patients,
+surv_multiuni output the table with general survival analysis result with Number of total patients,
 Number of Events, Estimated Median, 1,2,5 year rate, HR (95\% Confidence Interval),P value This function only change the format of the output table.
 }
 \examples{
