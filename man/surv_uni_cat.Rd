@@ -4,8 +4,8 @@
 \alias{surv_uni_cat}
 \title{A complete table for univariable survival analysis}
 \usage{
-surv_uni_cat(Data, Stime, Event, Svar, month = 0, y1 = T, y2 = T,
-  y5 = T)
+surv_uni_cat(Data, Stime, Event, Svar, month = 0, medianCI = F,
+  y1 = T, y2 = T, y5 = T, AIC = F)
 }
 \arguments{
 \item{Stime}{This is the follow up time}
@@ -22,14 +22,16 @@ surv_uni_cat(Data, Stime, Event, Svar, month = 0, y1 = T, y2 = T,
 
 \item{y5}{5-year survival rate(yes/no)}
 
+\item{AIC}{show AIC and C index (yes/no)}
+
 \item{D}{A data.frame in which to interpret the variables}
 }
 \value{
 A tibble of survival output
 }
 \description{
-JS.uni output the table with general survival analysis result with Number of total patients,
-Number of Events, Estimated Median, 1,2,5 year rate, HR (95\% Confidence Interval),P value, AIC and C index. This function only change the format of the output table.
+surv_uni_cat output the table with general survival analysis result with Number of total patients,
+Number of Events, Estimated Median (95%CI), 1,2,5 year rate, HR (95\% Confidence Interval),P value, AIC and C index. This function only change the format of the output table.
 }
 \examples{
 surv_uni_cat(Dat, "surv", "scensor", "DS-GPA")
