@@ -37,10 +37,10 @@ surv_uni_con <- function(Data, Stime, Event, Svar){
     mutate(`P` = c(summary(fit1)$coefficients[,5] %>% JS.p))
 
   ## AIC , C index (D index maybe)
-  blackrow = rep("",nrow(result)-1)
-  result %<>%
-    mutate(`C Index` =  c(J.digit(summary(fit1)$concordance[1],2),blackrow)) %>%
-    mutate(`AIC` = c(J.digit(AIC(fit1),2),blackrow))
+  # blackrow = rep("",nrow(result)-1)
+  # result %<>%
+  #   mutate(`C Index` =  c(J.digit(summary(fit1)$concordance[1],2),blackrow)) %>%
+  #   mutate(`AIC` = c(J.digit(AIC(fit1),2),blackrow))
 
   return(result)
 }

@@ -1,7 +1,7 @@
 #' A complete table for univariable survival analysis
 #'
-#'JS.uni output the table with general survival analysis result with Number of total patients,
-#'Number of Events, Estimated Median, 1,2,5 year rate, HR (95\% Confidence Interval),P value, AIC and C index. This function only change the format of the output table.
+#'surv_uni_cat output the table with general survival analysis result with Number of total patients,
+#'Number of Events, Estimated Median (95%CI), 1,2,5 year rate, HR (95\% Confidence Interval),P value, AIC and C index. This function only change the format of the output table.
 #'@param D A data.frame in which to interpret the variables
 #'@param Event The status indicator, normally 0=alive, 1=dead
 #'@param Stime This is the follow up time
@@ -10,13 +10,14 @@
 #'@param y1 1-year survival rate (yes/no)
 #'@param y2 2-year survival rate(yes/no)
 #'@param y5 5-year survival rate(yes/no)
+#'@param AIC show AIC and C index (yes/no)
 #'@return A tibble of survival output
 #'@examples
 #'surv_uni_cat(Dat, "surv", "scensor", "DS-GPA")
 #'@export
 #'@name surv_uni_cat
 #'
-surv_uni_cat <- function(Data, Stime, Event, Svar, month = 0, y1 = T, y2 = T, y5 = T){
+surv_uni_cat <- function(Data, Stime, Event, Svar, month = 0, medianCI = F, y1 = T, y2 = T, y5 = T, AIC = F){
   ## univariable analysis for one factor variable.
   ## input : Data, Survival time, Event, Testing variable, AsFactor or not, Month of survival rate, and Rho (type of logtest)
   ## output: N, N.event, median survival , 1-year rate(95%CI), 2-year rate(95%CI), 5-year rate(95%CI), other rate, HR(95%CI), P, AIC, and C index
@@ -40,6 +41,11 @@ surv_uni_cat <- function(Data, Stime, Event, Svar, month = 0, y1 = T, y2 = T, y5
 
   ## median survival
   result %<>% mutate(`Estimated Median (month)` = summary(fit2 )$table[,c('median')] %>% format(.,digits = 3))
+
+  if (medianCI == T){
+  result %<>% mutate(`Estimated Median (lower 0.95CI)` = summary(fit2 )$table[,c('0.95LCL')] %>% format(.,digits = 3))
+  result %<>% mutate(`Estimated Median (upper 0.95CI)` = summary(fit2 )$table[,c('0.95UCL')] %>% format(.,digits = 3))
+  }
 
   ##time range
   D %>% group_by(Svar) %>% summarise(Value = max(Stime,na.rm = TRUE)) -> .tmp
@@ -82,10 +88,11 @@ surv_uni_cat <- function(Data, Stime, Event, Svar, month = 0, y1 = T, y2 = T, y5
     mutate(`P` = c( "", summary(fit1)$coefficients[,5] %>% JS.p))
 
   ## AIC , C index (D index maybe)
+  if(AIC == T){
   blackrow = rep("",nrow(result)-1)
   result %<>%
     mutate(`C Index` =  c(J.digit(summary(fit1)$concordance[1],2),blackrow)) %>%
     mutate(`AIC` = c(J.digit(AIC(fit1),2),blackrow))
-
+  }
   return(result)
 }

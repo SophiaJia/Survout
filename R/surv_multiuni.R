@@ -19,13 +19,13 @@
 #'@name surv_multiuni
 #'
 
-surv_multiuni <- function (Data, Stime, Event, catSvars = NULL, conSvars = NULL, y1 = T, y2 = T, y5 = T)
+surv_multiuni <- function (Data, Stime, Event, catSvars = NULL, conSvars = NULL, y1 = T, y2 = T, y5 = T, medianCI = F)
 {
   rs.all <- tibble()
 
   if(!is.null(catSvars)){
     for (i in 1:length(catSvars)) {
-     rs <- surv_uni_cat(Data, Stime, Event, catSvars[i], y1 = y1, y2 = y2, y5 = y5)
+     rs <- surv_uni_cat(Data, Stime, Event, catSvars[i], y1 = y1, y2 = y2, y5 = y5, medianCI = medianCI)
      rs.all <- bind_rows(rs.all, rs)
      }
   }

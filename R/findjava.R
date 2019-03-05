@@ -1,6 +1,5 @@
 #' find java path , solve the rjava problem
 #
-#'@param
 #'@return all of your java paths
 #'@examples
 #' findjava
