@@ -34,10 +34,10 @@ surv_uni_cat <- function(Data, Stime, Event, Svar, month = 0, medianCI = F, y1 =
 
   # N and event N
   result = tibble(
-    `Variable` = c(Svar, rep(" ", length(fit0$n)-1)),
+    `Variable Name` = c(Svar, rep(" ", length(fit0$n)-1)),
     `Variable Level` =  D$Svar %>% table() %>% names(),
-    N = fit0$n,
-    `No.Event` = fit0$obs)
+    `No Obs` = fit0$n,
+    `No Event` = fit0$obs)
 
   ## median survival
   result %<>% mutate(`Estimated Median (month)` = summary(fit2 )$table[,c('median')] %>% format(.,digits = 3))
