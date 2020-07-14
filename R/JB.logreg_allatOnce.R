@@ -19,7 +19,7 @@ JB.logreg_allatOnce <- function(D, xvar, yvar, xname, yname){
   ytmp = as.matrix(D[yvar])[,1]
   T2 <- JB.logreg_m(tmp, ytmp, xname, yname)
   ## MVA
-  f1 <- JB.logreg_multi(glm(as.matrix(tt[yvar])[,1]~.,family = binomial, data = tmp))
+  f1 <- JB.logreg_multi(glm(ytmp~.,family = binomial, data = tmp))
   T3 <- T2
   T3[which(T3[,5] != "Ref"),5] <- f1[,1]
   T3[which(T3[,5] != "Ref"),6] <- f1[,2]
