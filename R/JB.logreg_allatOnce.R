@@ -23,5 +23,8 @@ JB.logreg_allatOnce <- function(D, xvar, yvar, xname, yname){
   T3 <- T2
   T3[which(T3[,5] != "Ref"),5] <- f1[,1]
   T3[which(T3[,5] != "Ref"),6] <- f1[,2]
-  out = list(T2, T3)
+  T3 = T3[,c(1, 2, 5, 6)]
+  T4 = cbind(T2, T3[,c(3, 4)])
+  colnames(T4) <- c( "Variable Name", "Levels","Hypertension (No)","Hypertension (Yes)", "UVA-OR(95%CI)", "UVA-P",  "MVA-OR(95%CI)", "MVA-P")
+  out = list(T2, T3, T4)
 }
