@@ -4,8 +4,7 @@
 \alias{crisk_ord}
 \title{A output table for univariable and multivariable competing risk analysis (ordinal only)}
 \usage{
-crisk_ord(csurv, cevent, cvars, gnames, month = 0, y1 = T, y2 = T,
-  y5 = T)
+crisk_ord(csurv, cevent, cvars, gnames, month = 0, y1 = T, y2 = T, y5 = T)
 }
 \arguments{
 \item{csurv}{Follow up time}

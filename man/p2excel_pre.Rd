@@ -4,8 +4,7 @@
 \alias{p2excel_pre}
 \title{The excel output of a dataset prepration}
 \usage{
-p2excel_pre(tabname = "Default", datastable, tablename = "Default",
-  filesave)
+p2excel_pre(tabname = "Default", datastable, tablename = "Default", filesave)
 }
 \arguments{
 \item{tabname}{The name of the tab,}

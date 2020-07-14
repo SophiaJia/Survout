@@ -4,8 +4,7 @@
 \alias{crisk_cat}
 \title{A output table for univariable risk analysis (catigorical only)}
 \usage{
-crisk_cat(csurv, cevent, cvars, gnames, month = 0, y1 = T, y2 = T,
-  y5 = T)
+crisk_cat(csurv, cevent, cvars, gnames, month = 0, y1 = T, y2 = T, y5 = T)
 }
 \arguments{
 \item{csurv}{Follow up time}

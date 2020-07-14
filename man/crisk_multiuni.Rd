@@ -4,8 +4,18 @@
 \alias{crisk_multiuni}
 \title{A complete table for univariable compeiting risk analysis}
 \usage{
-crisk_multiuni(Data, Stime, Event, catSvars = NULL, conSvars = NULL,
-  ordSvars = NULL, y1 = T, y2 = T, y5 = T, month = 0)
+crisk_multiuni(
+  Data,
+  Stime,
+  Event,
+  catSvars = NULL,
+  conSvars = NULL,
+  ordSvars = NULL,
+  y1 = T,
+  y2 = T,
+  y5 = T,
+  month = 0
+)
 }
 \arguments{
 \item{Data}{A data.frame in which to interpret the variables}

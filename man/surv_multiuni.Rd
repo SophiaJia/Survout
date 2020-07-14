@@ -4,8 +4,17 @@
 \alias{surv_multiuni}
 \title{A complete table for univariable survival analysis}
 \usage{
-surv_multiuni(Data, Stime, Event, catSvars = NULL, conSvars = NULL,
-  y1 = T, y2 = T, y5 = T, medianCI = F)
+surv_multiuni(
+  Data,
+  Stime,
+  Event,
+  catSvars = NULL,
+  conSvars = NULL,
+  y1 = T,
+  y2 = T,
+  y5 = T,
+  medianCI = F
+)
 }
 \arguments{
 \item{Data}{A data.frame in which to interpret the variables}

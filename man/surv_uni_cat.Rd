@@ -4,8 +4,18 @@
 \alias{surv_uni_cat}
 \title{A complete table for univariable survival analysis}
 \usage{
-surv_uni_cat(Data, Stime, Event, Svar, month = 0, medianCI = F,
-  y1 = T, y2 = T, y5 = T, AIC = F)
+surv_uni_cat(
+  Data,
+  Stime,
+  Event,
+  Svar,
+  month = 0,
+  medianCI = F,
+  y1 = T,
+  y2 = T,
+  y5 = T,
+  AIC = F
+)
 }
 \arguments{
 \item{Stime}{This is the follow up time}

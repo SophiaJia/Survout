@@ -4,8 +4,12 @@
 \alias{p2excel}
 \title{The excel output of a dataset}
 \usage{
-p2excel(tabname = "Default", datastable, tablename = "Default",
-  filename = "Default.xlsx")
+p2excel(
+  tabname = "Default",
+  datastable,
+  tablename = "Default",
+  filename = "Default.xlsx"
+)
 }
 \arguments{
 \item{tabname}{The name of the tab,}

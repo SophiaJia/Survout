@@ -4,8 +4,7 @@
 \alias{crisk_multi}
 \title{A output table for multivariable competing risk model}
 \usage{
-crisk_multi(data, csurv, cevent, mvars, gnames, con_var = NULL,
-  cat_var = NULL)
+crisk_multi(data, csurv, cevent, mvars, gnames, con_var = NULL, cat_var = NULL)
 }
 \arguments{
 \item{data}{Dataset}
