@@ -51,7 +51,7 @@ crisk_cat <- function(csurv, cevent, cvars, gnames, month = 0, y1 = T, y2 = T, y
 
   # build model
   fit = cmprsk::crr(csurv, cevent, var.matrix)
-  fit2 <- cmprsk::cuminc(csurv, cevent, var.matrix)
+  fit2 <- cmprsk::cuminc(csurv, cevent, cvars)
 
   ## time range (the min follow up time of these levels)
   tmp.df <- cbind(csurv, cvars) %>% as.tibble()
