@@ -26,7 +26,7 @@ surv_uni_con <- function(Data, Stime, Event, Svar){
   fit1 <- coxph(Surv(Stime, Event) ~ Svar, data = D1)
 
   # assign name to result tibble
-  l <- list(Variable = Svar)
+  l <- list("Variable Name" = Svar)
   result <- as_tibble(l)
 
   ##HR (95\% Confidence Interval)
