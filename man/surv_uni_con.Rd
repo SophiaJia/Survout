@@ -2,26 +2,28 @@
 % Please edit documentation in R/surv_uni_con.R
 \name{surv_uni_con}
 \alias{surv_uni_con}
-\title{A complete table for univariable survival analysis}
+\title{Modify the Survival Output for a Continuous Variable.}
 \usage{
-surv_uni_con(Data, Stime, Event, Svar)
+surv_uni_con(dat, stime, sevent, svar, report_index = FALSE)
 }
 \arguments{
-\item{Stime}{This is the follow up time}
+\item{dat}{a data.frame.}
 
-\item{Event}{The status indicator, normally 0=alive, 1=dead}
+\item{stime}{the duration of follow-up time in months.}
 
-\item{Svar}{A vector of group}
+\item{sevent}{the status indicator, which is generally 0 = alive, 1 = dead.}
 
-\item{D}{A data.frame in which to interpret the variables}
+\item{svar}{a variable name.}
+
+\item{report_index}{logical value indicating if to report the show AIC and C index.}
 }
 \value{
-A tibble of survival output
+a tibble of survival results.
 }
 \description{
-JS.uni output the table with general survival analysis result with Number of total patients,
-Number of Events, Estimated Median, 1,2,5 year rate, HR (95\% Confidence Interval),P value, AIC and C index. This function only change the format of the output table.
+This function generates a table with the general survival analysis results, including the number of total patients, the number of events, the P value, the AIC, and the C index. This function just modifies the output table's format.
 }
 \examples{
-surv_uni_con(Dat, "surv", "scensor", "age")
+Dat <- survival::lung
+surv_uni_con(Dat, "time", "status", "age",report_index = TRUE)
 }

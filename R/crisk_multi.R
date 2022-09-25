@@ -1,43 +1,47 @@
-#' A output table for multivariable competing risk model
+#'@title Modify the Output for a Multi-variable Competing Risk Analysis .
 #'
-#'# Output:  Hazard ratio , P, c-index
+#'@description Create a table with the general multi-variable competing risk analysis results, including the HR (95 percent CI), P value.
 #
-#'@param data Dataset
-#'@param cevent The status indicator, normally 0 = alive, 1 = event, 2 = other event
-#'@param csurv Follow up time
-#'@param mvars one Catagorical Variable
-#'@param gnames A text vector of the the group name for output
-#'@return Output: a well-formated table ,  Hazard ratio , P
+#'@param dat a data.frame in which to interpret the variables.
+#'@param cevent the status indicator, normally 0=alive, 1=dead.
+#'@param csurv this is the follow up time.
+#'@param catvars a vector of cat variable names.
+#'@param convars a vector of con variable names.
+#'@return a tibble of competing risk analysis output.
 #
 #'@examples
-#'mvars <- c("age50", "Race", "Sentinel.lymph.node.positivity", "Surgical.margin.positivity", "Vascular.invasion", "Surgery.type", "Radiation.therapy.received", "Neoadjuvant.Chemotherapy" , "Adjuvant.chemotherapy","Overall.clincal.staging..TNM." )
-#'multi_out_d<- crisk_multi(NewDat2, "pfs","dcensor",mvars)
+#'Dat <- MASS::Melanoma
+#'Dat$time <- Dat$time/30.5
+#'con_var <- c("age","thickness")
+#'cat_var <- c("sex","ulcer")
+#'multi_out <- crisk_multi(Dat, "time", "status", catvars = cat_var, convars =con_var)
 #'
 #'@export
 #'@name crisk_multi
 #'
 
-crisk_multi <- function(data, csurv, cevent, mvars, gnames, con_var = NULL, cat_var = NULL){
+crisk_multi <- function(dat, csurv, cevent,  convars = NULL, catvars = NULL){
 
   # make a  new dataset
-  varD  <- data[,c(csurv, cevent,mvars)]
-  varD2 <- data[,c(csurv, cevent,mvars)]
+  mvars <- c(convars,catvars)
+  varD  <- dat[,c(csurv, cevent,mvars)]
+  varD2 <- dat[,c(csurv, cevent,mvars)]
 
   # identify column type
-  if (is.null(con_var)){
-    con_var   <- colnames(varD)[sapply(varD, mode) == "numeric"]
+  if (is.null(convars)){
+    convars   <- colnames(varD)[sapply(varD, mode) == "numeric"]
     #con_names <- colnames(NewDat)[sapply(NewDat, class) == "numeric"]
   }
 
-  if(is.null(cat_var)){
-    cat_var   <- colnames(varD)[sapply(varD, mode) == "character"]
+  if(is.null(catvars)){
+    catvars   <- colnames(varD)[sapply(varD, mode) == "character"]
     #cat_names <- colnames(NewDat)[sapply(NewDat, class) == "character"]
   }
 
   # for categorical data, will condiser groups < 10 without event as NA
-  n = length(cat_var)
-  for(i in cat_var){
-    varD[,i]<- ingorfactor_c(varD[,i], data[,cevent])
+  n <- length(catvars)
+  for(i in catvars){
+    varD[,i]<- ingorfactor_c(varD[,i], dat[,cevent])
     # for chat variable   will chose the first level as referece
     # and make a matrix for modeling
 
@@ -48,8 +52,8 @@ crisk_multi <- function(data, csurv, cevent, mvars, gnames, con_var = NULL, cat_
     varD <- varD[,-which(names(varD) == i)]
 
   }
-  blackrow = rep("")
-  fit <- crr(varD[,1], varD[,2], varD[,-c(1,2)])
+  blackrow <- rep("")
+  fit <- cmprsk::crr(varD[,1], varD[,2], varD[,-c(1,2)])
   S <- summary(fit)
   HR <- J.digit(S$coef[, c(2)], 2)
   LCL <- J.digit(S$conf.int[, c(3)], 2)

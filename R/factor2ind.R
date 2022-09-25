@@ -1,30 +1,20 @@
-#' competing risk helper function, crr
+#' Make An Integer Matrix Out of A Factor Variable.
 #'
-#' Given a factor variable x, create an indicator matrix of dimension
-#' length(x) x (nlevels(x)-1) dropping the column corresponding to the
-#  baseline level (by default the first level is used as baseline).
-#'@param x a Variable
-#'@param baseline Reference level
-
-#'@return x variable with some NA Values
+#'Create an indicator matrix of dimension length(x) x (nlevels(x)-1) with the column corresponding
+#'to the baseline level removed (by default the first level is used as baseline).
+#'@param x a variable.
+#'@param baseline a string indicating the reference level.
+#'@importFrom stats relevel
+#'@return a matrix
 #'@examples
-#'
-#'factor2ind(Sex,"M")
-#'factor2ind(Sex)
-#'
-#'
-#'x = gl(4, 2, labels = LETTERS[1:4])
+#'x = gl(4, 2, labels = c( "A", "B", "C", "D"))
 #'factor2ind(x)
 #'factor2ind(x, "C")
 #'@export
 #'@name factor2ind
-#'
-#'
-factor2ind <- function(x, baseline)
-{
-  # Given a factor variable x, create an indicator matrix of dimension
-  # length(x) x (nlevels(x)-1) dropping the column corresponding to the
-  # baseline level (by default the first level is used as baseline).
+
+
+factor2ind <- function(x, baseline){
 
   xname <- deparse(substitute(x))
   n <- length(x)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/p2excel.R
 \name{p2excel}
 \alias{p2excel}
-\title{The excel output of a dataset}
+\title{Export the A Single Dataframe to An Excel Sheet}
 \usage{
 p2excel(
   tabname = "Default",
@@ -12,21 +12,17 @@ p2excel(
 )
 }
 \arguments{
-\item{tabname}{The name of the tab,}
+\item{tabname}{a string with the tab's name.}
 
-\item{datastable}{The output dataset}
+\item{datastable}{the dataframe that will be exported to Excel.}
 
-\item{tablename}{The name of the table as the frist row}
+\item{tablename}{a string containing the table label and title, which will appear as the first row}
 
-\item{filename}{The name of the excel file}
+\item{filename}{the name of the spreadsheet}
 }
 \value{
-An excel sheet that ouputs the table
+a spreadsheet containing an exported tables
 }
 \description{
-The excel output of a dataset
-}
-\examples{
-p2excel(tabname = "Uni PFS", datastable = uni_out, tablename = "Table 2, Univariable PFS", filename = "Table2.xlsx" )
-p2excel(datastable = uni_out)
+The function saves a dataframe into an excel sheet with a predetermined format.
 }

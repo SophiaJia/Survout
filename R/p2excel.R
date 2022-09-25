@@ -1,21 +1,18 @@
-#' The excel output of a dataset
-#'@param tabname  The name of the tab,
-#'@param datastable  The output dataset
-#'@param tablename The name of the table as the frist row
-#'@param filename The name of the excel file
-#'@return An excel sheet that ouputs the table
-#'@examples
-#'p2excel(tabname = "Uni PFS", datastable = uni_out, tablename = "Table 2, Univariable PFS", filename = "Table2.xlsx" )
-#'p2excel(datastable = uni_out)
+#'@title Export the A Single Dataframe to An Excel Sheet
+#'
+#'@description The function saves a dataframe into an excel sheet with a predetermined format.
+#'@param tabname  a string with the tab's name.
+#'@param datastable  the dataframe that will be exported to Excel.
+#'@param tablename a string containing the table label and title, which will appear as the first row
+#'@param filename the name of the spreadsheet
+#'@return a spreadsheet containing an exported tables
 #'@export
 #'@name p2excel
-#'
 
-p2excel <-function(tabname = "Default", datastable, tablename = "Default", filename = "Default.xlsx")
-{
+p2excel <-function(tabname = "Default", datastable, tablename = "Default", filename = "Default.xlsx"){
   wb <- createWorkbook()
   addWorksheet(wb,tabname)
-  writeData(wb, tabname,data.frame( tablename), startRow=1,colNames=F)
+  writeData(wb, tabname,data.frame( tablename), startRow=1,colNames=FALSE)
   hs1=createStyle(fgFill="#DCE6F1",halign="CENTER",textDecoration="bold")
   writeData(wb,tabname, datastable, startRow=2,headerStyle = hs1)
   setColWidths(wb,tabname, cols = 1:(dim(datastable)[2]), widths = "auto")

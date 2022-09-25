@@ -1,70 +1,68 @@
-#' A complete table for univariable survival analysis
+#'@title Modify the Survival Output for a Categorical Variable.
 #'
-#'surv_uni_cat output the table with general survival analysis result with Number of total patients,
-#'Number of Events, Estimated Median (95%CI), 1,2,5 year rate, HR (95\% Confidence Interval),P value, AIC and C index. This function only change the format of the output table.
-#'@param D A data.frame in which to interpret the variables
-#'@param Event The status indicator, normally 0=alive, 1=dead
-#'@param Stime This is the follow up time
-#'@param Svar A vector of group
-#'@param month month-rate of survival
-#'@param y1 1-year survival rate (yes/no)
-#'@param y2 2-year survival rate(yes/no)
-#'@param y5 5-year survival rate(yes/no)
-#'@param AIC show AIC and C index (yes/no)
-#'@return A tibble of survival output
+#'@description This function generates a table with the general survival analysis results, including the number of total patients, the number of sevents, the estimated median, the 1,2,5 year rate, the HR (95 percent confidence interval), the P value, the AIC, and the C index. This function just modifies the output table's format.
+#'@param dat a data.frame.
+#'@param sevent the status indicator, which is generally 0 = alive, 1 = dead.
+#'@param stime the duration of follow-up time in months.
+#'@param svar a variable name.
+#'@param month a number to get the month-rate of survival.
+#'@param medianCI logical value indicating whether the 95 percent confidence interval of projected median survival should be reported.
+#'@param y1 logical value indicating whether the 1-year survival rate should be reported.
+#'@param y2 logical value indicating whether the 2-year survival rate should be reported.
+#'@param y5 logical value indicating whether the 5-year survival rate should be reported.
+#'@param report_index logical value indicating if to report the show AIC and C index.
+#'@importFrom stats AIC
+#'@return a tibble of survival output
 #'@examples
-#'surv_uni_cat(Dat, "surv", "scensor", "DS-GPA")
+#'Dat <- survival::lung
+#'surv_uni_cat(Dat, "time", "status", "sex", report_index = TRUE)
 #'@export
 #'@name surv_uni_cat
 #'
-surv_uni_cat <- function(Data, Stime, Event, Svar, month = 0, medianCI = F, y1 = T, y2 = T, y5 = T, AIC = F){
-  ## univariable analysis for one factor variable.
-  ## input : Data, Survival time, Event, Testing variable, AsFactor or not, Month of survival rate, and Rho (type of logtest)
-  ## output: N, N.event, median survival , 1-year rate(95%CI), 2-year rate(95%CI), 5-year rate(95%CI), other rate, HR(95%CI), P, AIC, and C index
-  ## require library: survival , tidyverse
-  ## can it comes with a plot in this function?
+surv_uni_cat <- function(dat, stime, sevent, svar, month = 0, medianCI = TRUE, y1 = TRUE, y2 = TRUE, y5 = TRUE, report_index = FALSE){
 
-  D <- Data %>% select(Stime = Stime, Event = Event, Svar = Svar)
+  D <- dat %>% select(stime = all_of(stime), sevent = all_of(sevent), svar = all_of(svar))
   # D <- na.omit(D)
 
   # default log-rank test
-  fit0 <- survdiff(Surv(Stime, Event) ~ Svar, data = D)
-  fit1 <- coxph(Surv(Stime, Event) ~ as.factor(Svar), data = D)
-  fit2 <- survfit(Surv(Stime, Event) ~ Svar, data = D, conf.type="log-log")
+  fit0 <- survdiff(Surv(stime, sevent) ~ svar, data = D)
+  fit1 <- coxph(Surv(stime, sevent) ~ as.factor(svar), data = D)
+  fit2 <- survfit(Surv(stime, sevent) ~ svar, data = D, conf.type="log-log")
 
-  # N and event N
-  result = tibble(
-    `Variable Name` = c(Svar, rep(" ", length(fit0$n)-1)),
-    `Variable Level` =  D$Svar %>% table() %>% names(),
+  # N and sevent N
+  result <- tibble(
+    `Variable Name` = c(svar, rep(" ", length(fit0$n)-1)),
+    `Variable Level` =  D$svar %>% table() %>% names(),
     `No Obs` = fit0$n,
-    `No Event` = fit0$obs)
+    `No sevent` = fit0$obs)
 
   ## median survival
-  result %<>% mutate(`Estimated Median (month)` = summary(fit2 )$table[,c('median')] %>% format(.,digits = 3))
+  result <- result %>%
+    mutate(`Estimated Median` = summary(fit2 )$table[,c('median')] %>% format(.,digits = 3))
 
-  if (medianCI == T){
-  result %<>% mutate(`Estimated Median (lower 0.95CI)` = summary(fit2 )$table[,c('0.95LCL')] %>% format(.,digits = 3))
-  result %<>% mutate(`Estimated Median (upper 0.95CI)` = summary(fit2 )$table[,c('0.95UCL')] %>% format(.,digits = 3))
+  if (medianCI == TRUE){
+  result <- result %>% mutate(`Estimated Median (lower 0.95CI)` = summary(fit2 )$table[,c('0.95LCL')] %>% format(.,digits = 3))
+  result <- result %>% mutate(`Estimated Median (upper 0.95CI)` = summary(fit2 )$table[,c('0.95UCL')] %>% format(.,digits = 3))
   }
 
   ##time range
-  D %>% group_by(Svar) %>% summarise(Value = max(Stime,na.rm = TRUE)) -> .tmp
-  time_min = .tmp$Value %>% min()
+  D %>% group_by(svar) %>% summarise(Value = max(stime,na.rm = TRUE)) -> tmp
+  time_min <- tmp$Value %>% min()
 
   ## survival rate
 
-  if(time_min > 11.999999 & y1 == T){
-    result %<>% mutate(`1-year rate` = paste(J.digit(summary(fit2, time = 12)$surv * 100 , 0), '%(' ,
+  if(time_min > 11.999999 & y1 == TRUE){
+    result <- result %>% mutate(`1-year rate` = paste(J.digit(summary(fit2, time = 12)$surv * 100 , 0), '%(' ,
                                              J.digit(summary(fit2, time = 12)$lower * 100, 0), '%, ',
                                              J.digit(summary(fit2, time = 12)$upper * 100, 0),  '%)'))
   }
-  if(time_min > 23.999999 & y2 == T){
-    result %<>% mutate(`2-year rate` =  paste(J.digit(summary(fit2, time = 24)$surv * 100 , 0), '%(' ,
+  if(time_min > 23.999999 & y2 == TRUE){
+    result <- result %>% mutate(`2-year rate` =  paste(J.digit(summary(fit2, time = 24)$surv * 100 , 0), '%(' ,
                                               J.digit(summary(fit2, time = 24)$lower * 100, 0), '%, ',
                                               J.digit(summary(fit2, time = 24)$upper * 100, 0),  '%)'))
   }
-  if(time_min > 59.999999 & y5 == T){
-    result %<>% mutate(`5-year rate` = paste(J.digit(summary(fit2, time = 60)$surv * 100 , 0), '%(' ,
+  if(time_min > 59.999999 & y5 == TRUE){
+    result <- result %>% mutate(`5-year rate` = paste(J.digit(summary(fit2, time = 60)$surv * 100 , 0), '%(' ,
                                              J.digit(summary(fit2, time = 60)$lower * 100, 0), '%, ',
                                              J.digit(summary(fit2, time = 60)$upper * 100, 0),  '%)'))
   }
@@ -73,7 +71,7 @@ surv_uni_cat <- function(Data, Stime, Event, Svar, month = 0, medianCI = F, y1 =
       warning("The month your choose is beyond the time range, choose a smaller one")
     }
     else{
-      result %<>% mutate(`N-year rate` = paste(J.digit(summary(fit2, time = month)$surv * 100 , 0), '%(' ,
+      result <- result %>% mutate(`N-year rate` = paste(J.digit(summary(fit2, time = month)$surv * 100 , 0), '%(' ,
                                                J.digit(summary(fit2, time = month)$lower * 100, 0), '%, ',
                                                J.digit(summary(fit2, time = month)$upper * 100, 0),  '%)'))
 
@@ -81,16 +79,16 @@ surv_uni_cat <- function(Data, Stime, Event, Svar, month = 0, medianCI = F, y1 =
   }
 
   ##HR (95\% Confidence Interval)
-  result %<>%
+  result <- result %>%
     mutate(`HR (95%CI)` = c( "Ref",paste(J.digit(summary(fit1)$conf.int[, 1], 2), '(' ,
                                          J.digit(summary(fit1)$conf.int[, 3], 2), ',' ,
                                          J.digit(summary(fit1)$conf.int[, 4], 2), ')' ))) %>%
     mutate(`P` = c( "", summary(fit1)$coefficients[,5] %>% JS.p))
 
   ## AIC , C index (D index maybe)
-  if(AIC == T){
-  blackrow = rep("",nrow(result)-1)
-  result %<>%
+  if(report_index == TRUE){
+  blackrow <- rep("",nrow(result)-1)
+  result <- result %>%
     mutate(`C Index` =  c(J.digit(summary(fit1)$concordance[1],2),blackrow)) %>%
     mutate(`AIC` = c(J.digit(AIC(fit1),2),blackrow))
   }

@@ -2,27 +2,31 @@
 % Please edit documentation in R/p2excel_pre.R
 \name{p2excel_pre}
 \alias{p2excel_pre}
-\title{The excel output of a dataset prepration}
+\title{Prepare to Export the Dataframe to An Excel Sheet.}
 \usage{
-p2excel_pre(tabname = "Default", datastable, tablename = "Default", filesave)
+p2excel_pre(tabname = "Default", datastable, tablename = "Default", filename)
 }
 \arguments{
-\item{tabname}{The name of the tab,}
+\item{tabname}{a string with the tab's name.}
 
-\item{datastable}{The output dataset}
+\item{datastable}{the dataframe that will be exported to Excel.}
 
-\item{tablename}{The name of the table as the frist row}
+\item{tablename}{a string containing the table label and title, which will appear as the first row}
 
-\item{filename}{The name of the excel file}
+\item{filename}{the name of the spreadsheet}
 }
 \value{
-An excel sheet that ouputs the table
+a spreadsheet containing all of the exported tables
 }
 \description{
-The excel output of a dataset prepration
+The function saves the dataframe as a tab and prepares it for output into an excel sheet with a predetermined format.
 }
 \examples{
-wb <- createWorkbook()
-wb <- p2excel_pre(tabname = "Uni PFS", datastable = uni_out, tablename = "Table 2, Univariable PFS", filesave = wb)
-saveWorkbook(wb, file = "filename.xlsx", overwrite = TRUE)
+Dat <- survival::lung
+results <- surv_uni_cat(Dat, "time", "status", "sex", report_index = TRUE)
+wb <- openxlsx::createWorkbook()
+wb <- p2excel_pre("survival_results",results,"Table 1. Overall Survival anlaysis",wb)
+## Not run:
+## saveWorkbook(wb, file = "os.xlsx", overwrite = TRUE)
+## End(Not run)
 }

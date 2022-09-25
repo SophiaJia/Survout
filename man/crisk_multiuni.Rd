@@ -2,50 +2,54 @@
 % Please edit documentation in R/crisk_multiuni.R
 \name{crisk_multiuni}
 \alias{crisk_multiuni}
-\title{A complete table for univariable compeiting risk analysis}
+\title{Modify the Output for Multiple Uni-variable Competing Risk Analysis .}
 \usage{
 crisk_multiuni(
-  Data,
-  Stime,
-  Event,
-  catSvars = NULL,
-  conSvars = NULL,
-  ordSvars = NULL,
-  y1 = T,
-  y2 = T,
-  y5 = T,
+  dat,
+  csurv,
+  cevent,
+  catvars = NULL,
+  convars = NULL,
+  ordvars = NULL,
+  y1 = TRUE,
+  y2 = TRUE,
+  y5 = TRUE,
   month = 0
 )
 }
 \arguments{
-\item{Data}{A data.frame in which to interpret the variables}
+\item{dat}{a data.frame in which to interpret the variables.}
 
-\item{Stime}{This is the follow up time}
+\item{csurv}{this is the follow up time.}
 
-\item{Event}{The status indicator, normally 0=alive, 1=dead}
+\item{cevent}{the status indicator, normally 0=alive, 1=dead.}
 
-\item{catSvars}{A vector of cat variables}
+\item{catvars}{a vector of cat variable names.}
 
-\item{conSvars}{A vector of con variables}
+\item{convars}{a vector of con variable names.}
 
-\item{ordSvars}{A vector of ordinal variables}
+\item{ordvars}{a vector of ordinal variable names.}
 
-\item{y1}{1-year survival rate (yes/no)}
+\item{y1}{logical value indicating whether the 1-year competing risk rate should be reported.}
 
-\item{y2}{2-year survival rate(yes/no)}
+\item{y2}{logical value indicating whether the 2-year competing risk rate should be reported.}
 
-\item{y5}{5-year survival rate(yes/no)}
+\item{y5}{logical value indicating whether the 5-year competing risk rate should be reported.}
+
+\item{month}{a number to get the month-rate of competing risk.}
 }
 \value{
-A tibble of survival output
+a tibble of competing risk analysis output.
 }
 \description{
-crisk_multiuni output the table with general survival analysis result with Number of total patients,
-Number of Events, Estimated Median, 1,2,5 year rate, HR (95\% Confidence Interval),P value This function only change the format of the output table.
+This function generates a table of competing risk analysis result with number of patients, number of event, number of competing event,
 }
 \examples{
-con_var <- colnames(NewDat)[sapply(NewDat, class) == "numeric"][c(-1, -(6:11))]
-ord_var <- colnames(NewDat)[sapply(NewDat, class) == "factor"]
-cat_var <- colnames(NewDat)[sapply(NewDat, class) == "character"][c(-2, -8,-23, -25, -26, -c(10:17))]
-uni_out <- crisk_multiuni(NewDat, "pfs", "dcensor", catSvars = cat_var, ordSvars = ord_var, conSvars =con_var)
+Dat <- MASS::Melanoma
+Dat$time <- Dat$time/30.5
+Dat$ulcer <- as.factor(Dat$ulcer)
+con_var <- c("age")
+ord_var <- c("ulcer")
+cat_var <- c("sex")
+uni_out <- crisk_multiuni(Dat, "time", "status",cat_var, con_var, ord_var)
 }

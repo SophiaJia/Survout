@@ -2,28 +2,30 @@
 % Please edit documentation in R/crisk_con.R
 \name{crisk_con}
 \alias{crisk_con}
-\title{output for univariable and multivariable competing risk analysis (continuous and ordinal only)}
+\title{Modify the Output for Uni-variable and Multi-variable Competing Risk Analysis (Continuous and Ordinal Only)}
 \usage{
 crisk_con(csurv, cevent, cvars, gnames)
 }
 \arguments{
-\item{csurv}{Follow up time}
+\item{csurv}{the duration of follow-up time in months.}
 
-\item{cevent}{The status indicator, normally 0 = alive, 1 = event, 2 = other event}
+\item{cevent}{the status indicator, which is generally 0 = alive, 1 = event, 2 = other event}
 
-\item{cvars}{A Matrix of groups variables (continuous and ordinal only)}
+\item{cvars}{a matrix, which has the variables' values (continuous and ordinal only)}
 
-\item{gnames}{A text vector of the the group name for output}
+\item{gnames}{a text vector, which are the names of the variables.}
 }
 \value{
-A dataframed output including HRs (95\% Confidence Intervals), P values.
+a dataframe containing HRs (with 95\% Confidence Intervals) and P values
 }
 \description{
-output the table with general competing risk analysis result with HR (95\% Confidence Interval),P value. This function only change the format of the output.
+This function generates a table of competing risk analysis result with HR (95\% Confidence Interval),P value.
 }
 \examples{
-X      <- cbind(D$v1, D$v2 , D$age_ge60)
-Gnames <- c('SRSF2/U2FA1(WT vs Mutation)', 'Disease(AML vs MPN)', 'Age(< 60 vs > 60)')
-output <- crisk_con(D$surv, D$censor_rm, X, Gnames)
+Dat <- MASS::Melanoma
+Dat$time <- Dat$time/30.5
+X      <- cbind(Dat$age, Dat$thickness)
+Gnames <- c('age', 'thickness')
+output <- crisk_con(Dat$time, Dat$status, X, Gnames)
 
 }

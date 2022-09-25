@@ -2,47 +2,49 @@
 % Please edit documentation in R/surv_uni_cat.R
 \name{surv_uni_cat}
 \alias{surv_uni_cat}
-\title{A complete table for univariable survival analysis}
+\title{Modify the Survival Output for a Categorical Variable.}
 \usage{
 surv_uni_cat(
-  Data,
-  Stime,
-  Event,
-  Svar,
+  dat,
+  stime,
+  sevent,
+  svar,
   month = 0,
-  medianCI = F,
-  y1 = T,
-  y2 = T,
-  y5 = T,
-  AIC = F
+  medianCI = TRUE,
+  y1 = TRUE,
+  y2 = TRUE,
+  y5 = TRUE,
+  report_index = FALSE
 )
 }
 \arguments{
-\item{Stime}{This is the follow up time}
+\item{dat}{a data.frame.}
 
-\item{Event}{The status indicator, normally 0=alive, 1=dead}
+\item{stime}{the duration of follow-up time in months.}
 
-\item{Svar}{A vector of group}
+\item{sevent}{the status indicator, which is generally 0 = alive, 1 = dead.}
 
-\item{month}{month-rate of survival}
+\item{svar}{a variable name.}
 
-\item{y1}{1-year survival rate (yes/no)}
+\item{month}{a number to get the month-rate of survival.}
 
-\item{y2}{2-year survival rate(yes/no)}
+\item{medianCI}{logical value indicating whether the 95 percent confidence interval of projected median survival should be reported.}
 
-\item{y5}{5-year survival rate(yes/no)}
+\item{y1}{logical value indicating whether the 1-year survival rate should be reported.}
 
-\item{AIC}{show AIC and C index (yes/no)}
+\item{y2}{logical value indicating whether the 2-year survival rate should be reported.}
 
-\item{D}{A data.frame in which to interpret the variables}
+\item{y5}{logical value indicating whether the 5-year survival rate should be reported.}
+
+\item{report_index}{logical value indicating if to report the show AIC and C index.}
 }
 \value{
-A tibble of survival output
+a tibble of survival output
 }
 \description{
-surv_uni_cat output the table with general survival analysis result with Number of total patients,
-Number of Events, Estimated Median (95%CI), 1,2,5 year rate, HR (95\% Confidence Interval),P value, AIC and C index. This function only change the format of the output table.
+This function generates a table with the general survival analysis results, including the number of total patients, the number of sevents, the estimated median, the 1,2,5 year rate, the HR (95 percent confidence interval), the P value, the AIC, and the C index. This function just modifies the output table's format.
 }
 \examples{
-surv_uni_cat(Dat, "surv", "scensor", "DS-GPA")
+Dat <- survival::lung
+surv_uni_cat(Dat, "time", "status", "sex", report_index = TRUE)
 }

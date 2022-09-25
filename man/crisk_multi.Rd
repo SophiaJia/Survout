@@ -2,29 +2,32 @@
 % Please edit documentation in R/crisk_multi.R
 \name{crisk_multi}
 \alias{crisk_multi}
-\title{A output table for multivariable competing risk model}
+\title{Modify the Output for a Multi-variable Competing Risk Analysis .}
 \usage{
-crisk_multi(data, csurv, cevent, mvars, gnames, con_var = NULL, cat_var = NULL)
+crisk_multi(dat, csurv, cevent, convars = NULL, catvars = NULL)
 }
 \arguments{
-\item{data}{Dataset}
+\item{dat}{a data.frame in which to interpret the variables.}
 
-\item{csurv}{Follow up time}
+\item{csurv}{this is the follow up time.}
 
-\item{cevent}{The status indicator, normally 0 = alive, 1 = event, 2 = other event}
+\item{cevent}{the status indicator, normally 0=alive, 1=dead.}
 
-\item{mvars}{one Catagorical Variable}
+\item{convars}{a vector of con variable names.}
 
-\item{gnames}{A text vector of the the group name for output}
+\item{catvars}{a vector of cat variable names.}
 }
 \value{
-Output: a well-formated table ,  Hazard ratio , P
+a tibble of competing risk analysis output.
 }
 \description{
-# Output:  Hazard ratio , P, c-index
+Create a table with the general multi-variable competing risk analysis results, including the HR (95 percent CI), P value.
 }
 \examples{
-mvars <- c("age50", "Race", "Sentinel.lymph.node.positivity", "Surgical.margin.positivity", "Vascular.invasion", "Surgery.type", "Radiation.therapy.received", "Neoadjuvant.Chemotherapy" , "Adjuvant.chemotherapy","Overall.clincal.staging..TNM." )
-multi_out_d<- crisk_multi(NewDat2, "pfs","dcensor",mvars)
+Dat <- MASS::Melanoma
+Dat$time <- Dat$time/30.5
+con_var <- c("age","thickness")
+cat_var <- c("sex","ulcer")
+multi_out <- crisk_multi(Dat, "time", "status", catvars = cat_var, convars =con_var)
 
 }

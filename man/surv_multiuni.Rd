@@ -2,46 +2,51 @@
 % Please edit documentation in R/surv_multiuni.R
 \name{surv_multiuni}
 \alias{surv_multiuni}
-\title{A complete table for univariable survival analysis}
+\title{Modify the Output for Multiple Uni-variable Survival Analysis}
 \usage{
 surv_multiuni(
-  Data,
-  Stime,
-  Event,
-  catSvars = NULL,
-  conSvars = NULL,
-  y1 = T,
-  y2 = T,
-  y5 = T,
-  medianCI = F
+  dat,
+  stime,
+  sevent,
+  catvars = NULL,
+  convars = NULL,
+  y1 = TRUE,
+  y2 = TRUE,
+  y5 = TRUE,
+  medianCI = FALSE,
+  report_index = FALSE
 )
 }
 \arguments{
-\item{Data}{A data.frame in which to interpret the variables}
+\item{dat}{a dat.frame.}
 
-\item{Stime}{This is the follow up time}
+\item{stime}{the duration of follow-up time in months.}
 
-\item{Event}{The status indicator, normally 0=alive, 1=dead}
+\item{sevent}{the status indicator, which is generally 0 = alive, 1 = dead.}
 
-\item{catSvars}{A vector of cat variables}
+\item{catvars}{a vector of categorical variable names.}
 
-\item{conSvars}{A vector of con variables}
+\item{convars}{a vector of continuous variables names.}
 
-\item{y1}{1-year survival rate (yes/no)}
+\item{y1}{logical value indicating whether the 1-year survival rate should be reported.}
 
-\item{y2}{2-year survival rate(yes/no)}
+\item{y2}{logical value indicating whether the 2-year survival rate should be reported.}
 
-\item{y5}{5-year survival rate(yes/no)}
+\item{y5}{logical value indicating whether the 5-year survival rate should be reported.}
+
+\item{medianCI}{logical value indicating whether the 95 percent confidence interval of projected median survival should be reported.}
+
+\item{report_index}{logical value indicating if to report the show AIC and C index.}
 }
 \value{
 A tibble of survival output
 }
 \description{
-surv_multiuni output the table with general survival analysis result with Number of total patients,
-Number of Events, Estimated Median, 1,2,5 year rate, HR (95\% Confidence Interval),P value This function only change the format of the output table.
+This function generates a table with the general survival analysis results, including the number of total patients, the number of sevents, the estimated median, the 1,2,5 year rate, the HR (95 percent confidence interval), the P value, the AIC, and the C index. This function just modifies the output table's format.
 }
 \examples{
-conSvars <- c("Age","KPS")
-catSvars <- c("Gender")
-surv_multiuni(D, "pfs", "rcensor", catSvars, conSvars,y2 = F, y5 = F, y1 = F)# \%>\% View
+Dat <- survival::lung
+convars <- c("age","meal.cal")
+catvars <- c("sex")
+surv_multiuni(Dat, "time", "status", catvars, convars, medianCI = TRUE)
 }

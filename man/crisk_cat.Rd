@@ -2,26 +2,45 @@
 % Please edit documentation in R/crisk_cat.R
 \name{crisk_cat}
 \alias{crisk_cat}
-\title{A output table for univariable risk analysis (catigorical only)}
+\title{Modify the Output for Uni-variable and Multi-variable Competing Risk Analysis (Categorical Only)}
 \usage{
-crisk_cat(csurv, cevent, cvars, gnames, month = 0, y1 = T, y2 = T, y5 = T)
+crisk_cat(
+  csurv,
+  cevent,
+  cvars,
+  gnames,
+  month = 0,
+  y1 = TRUE,
+  y2 = TRUE,
+  y5 = TRUE
+)
 }
 \arguments{
-\item{csurv}{Follow up time}
+\item{csurv}{the duration of follow-up time in months.}
 
-\item{cevent}{The status indicator, normally 0 = alive, 1 = event, 2 = other event}
+\item{cevent}{the status indicator, which is generally 0 = alive, 1 = event, 2 = other event}
 
-\item{cvars}{one Catagorical Variable}
+\item{cvars}{a vector, which has the variable's values (categorical only)}
 
-\item{gnames}{A text vector of the the group name for output}
+\item{gnames}{a text string, which is the name of the variable.}
+
+\item{month}{a number to get the month-rate of competing risk.}
+
+\item{y1}{logical value indicating whether the 1-year competing risk rate should be reported.}
+
+\item{y2}{logical value indicating whether the 2-year competing risk rate should be reported.}
+
+\item{y5}{logical value indicating whether the 5-year competing risk rate should be reported.}
 }
 \value{
-Output: a well-formated table , with N , N of event. , N of competing event, 1-year, 2-year, 5-year, n- year incidence rate, Hazard ratio , P, c-index
+a tibble of competing risk analysis output.
 }
 \description{
-# Output: a well-formated table , with N , N of event. , N of competing event,
+This function generates a table of competing risk analysis result with number of patients,number of event, number of competing event,
 }
 \examples{
-output <- crisk_cat(NewDat$pfs, NewDat$dcensor, NewDat$Histologic.type, "gnames")
+Dat <- MASS::Melanoma
+Dat$time <- Dat$time/30.5
+output <- crisk_cat(Dat$time, Dat$status, Dat$ulcer, "ulcer")
 
 }

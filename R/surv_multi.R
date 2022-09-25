@@ -1,25 +1,27 @@
-#' A output table for multivariable survival analysis
+#'@title Modify the Output for a Multi-variable Survival Analysis.
 #'
-#'JS.multi output the table with general multivariable survival analysis result with  HR (95\% Confidence Interval),P value
+#'@description Create a table with the general multi-variable survival analysis results, including the HR (95 percent CI), P value.
 #'@param ... arguments will be passed to coxph
-#'@return A dataframe of coxph output including Variable names,  HRs (95\% Confidence Intervals), P values
+#'@return a dataframe containing coxph output that includes variable names, HRs (95% CIs), and P values.
 #'@examples
-#'JS.multi (Surv(as.numeric(pd_surv), pd_censor) ~ as.factor(tr_group) + as.factor(BMI_c) + BMI, data = D)
-#'
+#'Dat <- survival::lung
+#'surv_multi(survival::Surv(time, status) ~ as.factor(sex) + age + meal.cal, data = Dat)
 #'
 #'@export
-#'@name JS.multi
+#'@name surv_multi
 #'
 #'
 
-JS.multi<- function (...)
+surv_multi<- function (...)
 {
   # get input elements
   input <- c(...)
   input.data <- as.data.frame(input[2:length(input)])
 
   # get variables
-  input.var <- reshape2:::parse_formula(input[[1]])[2]
+  parse_formula_in <- eval(parse(text = "reshape2:::parse_formula"))
+
+  input.var <- parse_formula_in(input[[1]])[2]
   input.var2 <- unlist(input.var)
   var_n <- length(input.var2)
   vars <- NULL
@@ -43,7 +45,7 @@ JS.multi<- function (...)
   .black <- c("Reference",rep(" ", length(.surv.total[1,])-1))
   ##find locations- can I use apply?
   if (length(isfa) != 0) {
-    order.fa = isfa
+    order.fa <- isfa
     for ( i in 1:length(isfa)){
       order.fa[i] <- .fit$assign[[isfa[i] - i + 1]][1]
     }
